@@ -45,7 +45,7 @@ app.get('/test', (req, res) => {
   res.writeHead(200,{'Content-Type':'text/plain'})
   console.log('demoData', demoData);
   console.log('demoData.activityData()//////-----', JSON.stringify(demoData.activityData()));
-  res.end(JSON.stringify(demoData.activityData()));
+  res.end('V4----------------------' + JSON.stringify(demoData.activityData()));
 });
 
 // event handler
