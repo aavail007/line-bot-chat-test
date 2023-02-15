@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const line = require('@line/bot-sdk');
 const { Configuration, OpenAIApi } = require("openai");
+const {demoData} = require('./demoData')
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -37,24 +38,31 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
 app.get('/test', (req, res) => {
   res.writeHead(200,{'Content-Type':'text/plain'})
-  res.end('Hello World!~~~~~')
+  res.end('Hello World!~~~~~v2')
 });
 
 // event handler
 async function handleEvent(event) {
+  let textString = '';
   if (event.type !== 'message' || event.message.type !== 'text') {
     // ignore non-text-message event
     return Promise.resolve(null);
   }
 
-  const completion = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: event.message.text ,
-    max_tokens: 500,
-  });
+  if( event.message.text === '【機構活動】') {
+    textString = demoData.activityData();
+  } else {
+    const completion = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: event.message.text ,
+      max_tokens: 500,
+    });
+    textString = completion.data.choices[0].text.trim();
+  }
+
 
   // create a echoing text message
-  const echo = { type: 'text', text: completion.data.choices[0].text.trim() };
+  const echo = { type: 'text', text: textString };
   // const echo = { type: 'text', text: '123456AAA' }; // 自己測試寫死的回覆訊息
 
   // use reply API
