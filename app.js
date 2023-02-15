@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const line = require('@line/bot-sdk');
 const { Configuration, OpenAIApi } = require("openai");
-const {demoData} = require('./demoData')
+const demoData = require('./demoData')
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -27,9 +27,14 @@ const app = express();
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
+  console.log('req ***************', req);
+  console.log('res ***************', res);
   Promise
     .all(req.body.events.map(handleEvent))
-    .then((result) => res.json(result))
+    .then((result) => {
+      console.log('result ***************', result);
+      res.json(result)
+    })
     .catch((err) => {
       console.error(err);
       res.status(500).end();
@@ -38,7 +43,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
 app.get('/test', (req, res) => {
   res.writeHead(200,{'Content-Type':'text/plain'})
-  res.end('Hello World!~~~~~v2')
+  console.log('demoData', demoData);
+  console.log('demoData.activityData()//////-----', demoData.activityData());
+  res.end(demoData.activityData());
 });
 
 // event handler
@@ -60,7 +67,7 @@ async function handleEvent(event) {
     textString = completion.data.choices[0].text.trim();
   }
 
-
+  console.log('===== textString ======', textString);
   // create a echoing text message
   const echo = { type: 'text', text: textString };
   // const echo = { type: 'text', text: '123456AAA' }; // 自己測試寫死的回覆訊息

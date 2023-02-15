@@ -1,6 +1,6 @@
 module.exports = {
   activityData: function () {
-    return {
+    return `{
       type: "carousel",
       contents: [
         {
@@ -208,6 +208,6 @@ module.exports = {
           },
         },
       ],
-    };
+    }`;
   },
 };
