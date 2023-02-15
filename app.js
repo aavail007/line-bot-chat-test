@@ -44,8 +44,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
 app.get('/test', (req, res) => {
   res.writeHead(200,{'Content-Type':'text/plain'})
   console.log('demoData', demoData);
-  console.log('demoData.activityData()//////-----', JSON.stringify(demoData.activityData()));
-  res.end('V5----------------------' + JSON.stringify(demoData.activityData()));
+  console.log('demoData.activityData()//////-----', JSON.stringify(demoData.vitalsignData()));
+  res.end('V5----------------------' + JSON.stringify(demoData.vitalsignData()));
 });
 
 // event handler
@@ -57,13 +57,12 @@ async function handleEvent(event) {
     return Promise.resolve(null);
   }
 
-  if( event.message.text === '【機構活動】') {
+  if(event.message.text === '【機構活動】') {
     textString = demoData.activityData();
-    replayObj = {
-      type: "flex",
-      altText: "機構活動",
-      contents: textString
-    }
+    replayObj = buildFlexMsgObj('機構活動', textString);
+  } else if (event.message.text === '【生命徵象】') {
+    textString = demoData.vitalsignData();
+    replayObj = buildFlexMsgObj('生命徵象', textString);
   } else {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
@@ -79,6 +78,14 @@ async function handleEvent(event) {
 
   // use reply API
   return client.replyMessage(event.replyToken, replayObj);
+}
+
+function buildFlexMsgObj(altText, contents) {
+  return {
+    type: "flex",
+    altText,
+    contents
+  }
 }
 
 // listen on port

@@ -210,4 +210,135 @@ module.exports = {
       ],
     };
   },
+  vitalsignData: () => {
+    return {
+      type: "bubble",
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: "會員生命徵象",
+            weight: "bold",
+            color: "#1DB446",
+            size: "sm",
+          },
+          {
+            type: "text",
+            text: "王小明",
+            weight: "bold",
+            size: "xxl",
+            margin: "md",
+          },
+          {
+            type: "text",
+            text: "2023/02/15 15:38 量測",
+            size: "xs",
+            color: "#aaaaaa",
+            wrap: true,
+          },
+          {
+            type: "separator",
+            margin: "xxl",
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            margin: "xxl",
+            spacing: "sm",
+            contents: [
+              {
+                type: "box",
+                layout: "horizontal",
+                contents: [
+                  {
+                    type: "text",
+                    text: "體溫",
+                    size: "sm",
+                    color: "#555555",
+                    flex: 0,
+                  },
+                  {
+                    type: "text",
+                    text: "38",
+                    size: "sm",
+                    color: "#dc3545",
+                    align: "end",
+                  },
+                ],
+              },
+              {
+                type: "box",
+                layout: "horizontal",
+                contents: [
+                  {
+                    type: "text",
+                    text: "脈搏",
+                    size: "sm",
+                    color: "#555555",
+                    flex: 0,
+                  },
+                  {
+                    type: "text",
+                    text: "90 次/分",
+                    size: "sm",
+                    color: "#111111",
+                    align: "end",
+                  },
+                ],
+              },
+              {
+                type: "box",
+                layout: "horizontal",
+                contents: [
+                  {
+                    type: "text",
+                    text: "呼吸",
+                    size: "sm",
+                    color: "#555555",
+                    flex: 0,
+                  },
+                  {
+                    type: "text",
+                    text: "17 次/分",
+                    size: "sm",
+                    color: "#111111",
+                    align: "end",
+                  },
+                ],
+              },
+              {
+                type: "box",
+                layout: "horizontal",
+                margin: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: "收縮/舒張壓",
+                    size: "sm",
+                    color: "#555555",
+                    flex: 0,
+                  },
+                  {
+                    type: "text",
+                    text: "120/100",
+                    size: "sm",
+                    color: "#dc3545",
+                    align: "end",
+                    flex: 120,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      styles: {
+        footer: {
+          separator: true,
+        },
+      },
+    };
+  },
 };
