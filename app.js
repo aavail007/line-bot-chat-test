@@ -45,12 +45,13 @@ app.get('/test', (req, res) => {
   res.writeHead(200,{'Content-Type':'text/plain'})
   console.log('demoData', demoData);
   console.log('demoData.activityData()//////-----', JSON.stringify(demoData.activityData()));
-  res.end('V4----------------------' + JSON.stringify(demoData.activityData()));
+  res.end('V5----------------------' + JSON.stringify(demoData.activityData()));
 });
 
 // event handler
 async function handleEvent(event) {
   let textString = '';
+  let replayObj = {};
   if (event.type !== 'message' || event.message.type !== 'text') {
     // ignore non-text-message event
     return Promise.resolve(null);
@@ -58,6 +59,11 @@ async function handleEvent(event) {
 
   if( event.message.text === '【機構活動】') {
     textString = JSON.stringify(demoData.activityData());
+    replayObj = {
+      type: "flex",
+      altText: "機構活動",
+      contents: textString
+    }
   } else {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
@@ -65,15 +71,14 @@ async function handleEvent(event) {
       max_tokens: 500,
     });
     textString = completion.data.choices[0].text.trim();
+    replayObj = { type: 'text', text: textString };
   }
 
-  console.log('===== textString ======', textString);
-  // create a echoing text message
-  const echo = { type: 'text', text: textString };
-  // const echo = { type: 'text', text: '123456AAA' }; // 自己測試寫死的回覆訊息
+  console.log('===== replayObj ======', replayObj);
+  
 
   // use reply API
-  return client.replyMessage(event.replyToken, echo);
+  return client.replyMessage(event.replyToken, replayObj);
 }
 
 // listen on port
