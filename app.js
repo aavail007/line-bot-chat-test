@@ -57,6 +57,8 @@ async function handleEvent(event) {
   const regex = /^\【.*\】$/gm;
   let textString = '';
   let replayObj = {};
+  const userId = event.source.userId; // Line userId
+  console.log("Get Line userId ==================", userId);
   if (event.type !== 'message' || event.message.type !== 'text') {
     // ignore non-text-message event
     return Promise.resolve(null);
@@ -72,6 +74,8 @@ async function handleEvent(event) {
     } else if (event.message.text === '【關於我們】') {
       textString = demoData.aboutUs();
       replayObj = { type: 'text', text: textString };
+    } else if('userid') {
+      replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
     }
