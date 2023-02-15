@@ -74,7 +74,7 @@ async function handleEvent(event) {
     } else if (event.message.text === '【關於我們】') {
       textString = demoData.aboutUs();
       replayObj = { type: 'text', text: textString };
-    } else if('userid') {
+    } else if('【userid】') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
