@@ -44,8 +44,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
 app.get('/test', (req, res) => {
   res.writeHead(200,{'Content-Type':'text/plain'})
   console.log('demoData', demoData);
-  console.log('demoData.activityData()//////-----', demoData.activityData());
-  res.end(demoData.activityData());
+  console.log('demoData.activityData()//////-----', JSON.stringify(demoData.activityData()));
+  res.end(JSON.stringify(demoData.activityData()));
 });
 
 // event handler
@@ -57,7 +57,7 @@ async function handleEvent(event) {
   }
 
   if( event.message.text === '【機構活動】') {
-    textString = demoData.activityData();
+    textString = JSON.stringify(demoData.activityData());
   } else {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
