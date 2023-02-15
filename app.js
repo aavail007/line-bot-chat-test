@@ -69,6 +69,9 @@ async function handleEvent(event) {
     } else if (event.message.text === '【生命徵象】') {
       textString = demoData.vitalsignData();
       replayObj = buildFlexMsgObj('生命徵象', textString);
+    } else if (event.message.text === '【關於我們】') {
+      textString = demoData.aboutUs();
+      replayObj = { type: 'text', text: textString };
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
     }
