@@ -58,7 +58,7 @@ async function handleEvent(event) {
   }
 
   if( event.message.text === '【機構活動】') {
-    textString = JSON.stringify(demoData.activityData());
+    textString = demoData.activityData();
     replayObj = {
       type: "flex",
       altText: "機構活動",
