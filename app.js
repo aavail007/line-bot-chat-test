@@ -1,14 +1,20 @@
 require('dotenv').config();
-
 const express = require('express');
 const line = require('@line/bot-sdk');
+const axios = require('axios');
 const { Configuration, OpenAIApi } = require("openai");
-const demoData = require('./demoData')
+// const demoData = require('./demoData')
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
+const googleEnv = {
+  googleKey: process.env.GOOGLE_KEY,
+  googleSheetId: process.env.GOOGLE_SHEET_ID,
+  googleSheetName: process.env.GOOGLE_SHEET_NAME
+}
+let demoData;
 
 
 // create LINE SDK config from env variables
@@ -41,20 +47,16 @@ app.post('/callback', line.middleware(config), (req, res) => {
     });
 });
 
-app.get('/test', (req, res) => {
-  const regex = /^\【.*\】$/gm;
-  console.log('【機構活動】', regex.test("【機構活動】"));
-  console.log('【機構活動】123', regex.test("【機構活動】123"));
-  console.log('000【機構活動】', regex.test("000【機構活動】"));
+app.get('/test', async (req, res) => {
+  let demoData = await getDemoData();
+  console.log('demoData=====', demoData.data);
   res.writeHead(200,{'Content-Type':'text/plain'})
-  console.log('demoData', demoData);
-  console.log('demoData.activityData()//////-----', JSON.stringify(demoData.vitalsignData()));
-  res.end('V5----------------------' + JSON.stringify(demoData.vitalsignData()));
+  res.end('V6----------------------' + JSON.stringify(demoData.data.values[0][1]));
 });
 
 // event handler
 async function handleEvent(event) {
-  const regex = /^\【.*\】$/gm;
+  const regex = /^\[.*\]$/gm;
   let textString = '';
   let replayObj = {};
   const userId = event.source.userId; // Line userId
@@ -64,17 +66,17 @@ async function handleEvent(event) {
     return Promise.resolve(null);
   }
 
-  if (regex.test(event.message.text)) { // 有 【】包起來表示不須經由 GPT 回覆
-    if(event.message.text === '【機構活動】') {
-      textString = demoData.activityData();
+  if (regex.test(event.message.text)) { // 有 []包起來表示不須經由 GPT 回覆
+    if(event.message.text === '[機構活動]') {
+      textString = demoData.activityData;
       replayObj = buildFlexMsgObj('機構活動', textString);
-    } else if (event.message.text === '【生命徵象】') {
-      textString = demoData.vitalsignData();
+    } else if (event.message.text === '[生命徵象]') {
+      textString = demoData.vitalsignData;
       replayObj = buildFlexMsgObj('生命徵象', textString);
-    } else if (event.message.text === '【關於我們】') {
-      textString = demoData.aboutUs();
+    } else if (event.message.text === '[關於我們]') {
+      textString = demoData.aboutUs;
       replayObj = { type: 'text', text: textString };
-    } else if('【userid】') {
+    } else if('[userid]') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
@@ -100,6 +102,20 @@ function buildFlexMsgObj(altText, contents) {
     contents
   }
 }
+
+async function getDemoData() {
+  console.log("觸發撈取 google 資料");
+  var api_url = `https://sheets.googleapis.com/v4/spreadsheets/${googleEnv.googleSheetId}/values/${googleEnv.googleSheetName}?alt=json&key=${googleEnv.googleKey}`;
+  let data = await axios.get(api_url);
+  demoData = {
+    activityData: data.data.values[0][1],
+    vitalsignData: data.data.values[1][1],
+    aboutUs: data.data.values[2][1],
+  }
+  return data;
+}
+
+getDemoData();
 
 // listen on port
 const port = process.env.PORT || 3000;
