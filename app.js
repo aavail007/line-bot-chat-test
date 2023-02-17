@@ -14,7 +14,7 @@ const googleEnv = {
   googleSheetId: process.env.GOOGLE_SHEET_ID,
   googleSheetName: process.env.GOOGLE_SHEET_NAME
 }
-let demoDataFromGoogle;
+let demoDataFromGoogle = {}
 
 
 // create LINE SDK config from env variables
@@ -70,29 +70,30 @@ async function handleEvent(event) {
 
   if (regex.test(event.message.text)) { // 有 []包起來表示不須經由 GPT 回覆
     if(event.message.text === '[活動資料]') {
-      textString = demoData.activityData();
+      textString = demoDataFromGoogle.activityData;
       replayObj = buildFlexMsgObj('活動資料', textString);
     } else if (event.message.text === '[健康資料]') {
-      textString = demoData.vitalsignData();
+      textString = demoDataFromGoogle.vitalsignData;
       replayObj = buildFlexMsgObj('健康資料', textString);
     } else if (event.message.text === '[機構資訊]') {
-      textString = demoData.aboutUs();
+      textString = demoDataFromGoogle.aboutUs;
       replayObj = { type: 'text', text: textString };
     } else if(event.message.text === '[基本資料]') {
-      textString = demoData.memberInfo();
+      textString = demoDataFromGoogle.memberInfo;
       replayObj = buildFlexMsgObj('基本資料', textString);
     } else if(event.message.text === '[操作說明]') {
-      textString = demoData.instructions();
+      textString = demoDataFromGoogle.instructions;
       replayObj = { type: 'text', text: textString };
     } else if(event.message.text === '[userid]') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else if(event.message.text === '[切換住民]') {
-      textString = demoData.changeResident();
-      replayObj = { type: 'text', text: textString };
+      textString = demoDataFromGoogle.changeResident;
+      replayObj = buildFlexMsgObj('切換住民', textString);
     } else if(event.message.text.includes('[=')) { // 重複你說的話: 輸入 [={type:123}] 會取 [= ]中間的 
       replayObj = buildFlexMsgObj('自定義格式', event.message.text.match(/\[\=(\S*)]/)[1]);
     } else if(event.message.text.includes('[@')) { // 來自 google 
-      textString = JSON.parse(demoDataFromGoogle.activityData);
+      let key = event.message.text.match(/\[\@(\S*)]/)[1]
+      textString = JSON.parse(demoDataFromGoogle[key]);
       replayObj = buildFlexMsgObj('來自google data', textString);
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
@@ -123,18 +124,24 @@ async function getDemoData() {
   console.log("觸發撈取 google 資料");
   var api_url = `https://sheets.googleapis.com/v4/spreadsheets/${googleEnv.googleSheetId}/values/${googleEnv.googleSheetName}?alt=json&key=${googleEnv.googleKey}`;
   let data = await axios.get(api_url);
-  demoDataFromGoogle = {
-    activityData: data.data.values[0][1],
-    vitalsignData: data.data.values[1][1],
-    aboutUs: data.data.values[2][1],
-    memberInfo: data.data.values[3][1],
-    instructions: data.data.values[4][1],
-    changeResident: data.data.values[5][1],
-  }
+  // demoDataFromGoogle = {
+  //   activityData: data.data.values[0][1],
+  //   vitalsignData: data.data.values[1][1],
+  //   aboutUs: data.data.values[2][1],
+  //   memberInfo: data.data.values[3][1],
+  //   instructions: data.data.values[4][1],
+  //   changeResident: data.data.values[5][1],
+  // }
+
+  data.data.values.forEach(element => {
+    demoDataFromGoogle[element[0]] = element[1];
+  });
   console.log('demoDataFromGoogle****************', demoDataFromGoogle);
   console.log('JSON.stringify(demoDataFromGoogle)****************', JSON.stringify(demoDataFromGoogle));
   return demoDataFromGoogle;
 }
+
+getDemoData();
 
 // listen on port
 const port = process.env.PORT || 3000;
