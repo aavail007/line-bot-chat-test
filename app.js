@@ -49,9 +49,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
 app.get('/test', async (req, res) => {
   let demoDataFromGoogle = await getDemoData();
-  // let textString2 = JSON.parse(demoDataFromGoogle.activityData);
-  // console.log('textString2=====', textString2);
-  console.log('demoDataFromGoogle.activityData=====JSON.parse===========', JSON.parse(demoDataFromGoogle.activityData));
   res.writeHead(200,{'Content-Type':'text/plain'})
   res.end('V6----------------------' + JSON.stringify(demoDataFromGoogle));
 });
@@ -137,7 +134,6 @@ async function getDemoData() {
     demoDataFromGoogle[element[0]] = JSON.parse(element[1]);
   });
   console.log('demoDataFromGoogle****************', demoDataFromGoogle);
-  console.log('JSON.stringify(demoDataFromGoogle)****************', JSON.stringify(demoDataFromGoogle));
   return demoDataFromGoogle;
 }
 
