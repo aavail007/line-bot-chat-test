@@ -55,7 +55,7 @@ app.get('/test', async (req, res) => {
 
 // event handler
 async function handleEvent(event) {
-  console.log("Get Line userId ================== type ==== " + event.message.type + " ====== ", userId);
+  console.log("Get Line userId ================== type ==== " + event.message.type + " ====== ", event.source.userId);
   if (event.type === 'message' || event.message.type === 'text') {
     msgEvent(event);
   } else if(event.type === 'postback') {
