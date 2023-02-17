@@ -83,7 +83,7 @@ async function handleEvent(event) {
       replayObj = buildFlexMsgObj('基本資料', textString);
     } else if(event.message.text === '[操作說明]') {
       textString = demoDataFromGoogle.instructions;
-      replayObj = { type: 'text', text: textString };
+      replayObj = buildFlexMsgObj('操作說明', textString);
     } else if(event.message.text === '[userid]') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else if(event.message.text === '[切換住民]') {
@@ -93,7 +93,7 @@ async function handleEvent(event) {
       replayObj = buildFlexMsgObj('自定義格式', event.message.text.match(/\[\=(\S*)]/)[1]);
     } else if(event.message.text.includes('[@')) { // 來自 google 
       let key = event.message.text.match(/\[\@(\S*)]/)[1]
-      textString = JSON.parse(demoDataFromGoogle[key]);
+      textString = demoDataFromGoogle[key];
       replayObj = buildFlexMsgObj('來自google data', textString);
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
@@ -134,7 +134,7 @@ async function getDemoData() {
   // }
 
   data.data.values.forEach(element => {
-    demoDataFromGoogle[element[0]] = element[1];
+    demoDataFromGoogle[element[0]] = JSON.parse(element[1]);
   });
   console.log('demoDataFromGoogle****************', demoDataFromGoogle);
   console.log('JSON.stringify(demoDataFromGoogle)****************', JSON.stringify(demoDataFromGoogle));

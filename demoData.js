@@ -348,9 +348,55 @@ module.exports = {
     return "王小明，70歲，血型 B，個性活潑開朗";
   },
   changeResident: () => {
-    return "切換住民................";
+    return {
+      type: "bubble",
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: "請選擇要查看的住民",
+            weight: "bold",
+            size: "xl",
+            align: "center",
+          },
+          { type: "separator", margin: "md" },
+        ],
+        position: "relative",
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        spacing: "sm",
+        contents: [
+          {
+            type: "button",
+            style: "link",
+            height: "sm",
+            action: { type: "message", label: "王小明", text: "[王小明_001]" },
+          },
+          {
+            type: "button",
+            style: "link",
+            height: "sm",
+            action: { type: "message", label: "張小英", text: "[張小英_002]" },
+          },
+          {
+            type: "button",
+            action: {
+              type: "message",
+              label: "綁定新住民",
+              text: "[綁定新住民]",
+            },
+          },
+        ],
+        flex: 0,
+        paddingTop: "none",
+      },
+    };
   },
   instructions: () => {
     return "instructions 操作說明~~~~~~";
-  }
+  },
 };
