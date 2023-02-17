@@ -55,16 +55,22 @@ app.get('/test', async (req, res) => {
 
 // event handler
 async function handleEvent(event) {
+  console.log("Get Line userId ================== type ==== " + event.message.type + " ====== ", userId);
+  if (event.type === 'message' || event.message.type === 'text') {
+    msgEvent(event);
+  } else if(event.type === 'postback') {
+    postbackEvent(event);
+  } else {
+    // ignore non-text-message event
+    return Promise.resolve(null);
+  }
+}
+
+async function msgEvent(event) {
   const regex = /^\[.*\]$/gm;
   let textString = '';
   let replayObj = {};
   const userId = event.source.userId; // Line userId
-  console.log("Get Line userId ==================", userId);
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    // ignore non-text-message event
-    return Promise.resolve(null);
-  }
-
   if (regex.test(event.message.text)) { // 有 []包起來表示不須經由 GPT 回覆
     if(event.message.text === '[活動資料]') {
       textString = demoDataFromGoogle.activityData;
@@ -74,7 +80,7 @@ async function handleEvent(event) {
       replayObj = buildFlexMsgObj('健康資料', textString);
     } else if (event.message.text === '[機構資訊]') {
       textString = demoDataFromGoogle.aboutUs;
-      replayObj = { type: 'text', text: textString };
+      replayObj = buildFlexMsgObj('機構資訊', textString);
     } else if(event.message.text === '[基本資料]') {
       textString = demoDataFromGoogle.memberInfo;
       replayObj = buildFlexMsgObj('基本資料', textString);
@@ -109,6 +115,22 @@ async function handleEvent(event) {
   return client.replyMessage(event.replyToken, replayObj);
 }
 
+function postbackEvent(event) {
+  const data = event.postback.data;
+  let replayObj;
+  // 根据 postback 資料执行相应的操作
+  if (data === 'bindMember') {
+    replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號(請勿刪除輸入框的預設文字)' };
+    return client.replyMessage(event.replyToken, replayObj);
+  } else if (data === 'ACTION_2') {
+    // 执行操作 2
+  } else {
+    // 处理其他的 postback 資料
+    return Promise.resolve(null);
+  }
+
+}
+
 function buildFlexMsgObj(altText, contents) {
   return {
     type: "flex",
@@ -121,15 +143,6 @@ async function getDemoData() {
   console.log("觸發撈取 google 資料");
   var api_url = `https://sheets.googleapis.com/v4/spreadsheets/${googleEnv.googleSheetId}/values/${googleEnv.googleSheetName}?alt=json&key=${googleEnv.googleKey}`;
   let data = await axios.get(api_url);
-  // demoDataFromGoogle = {
-  //   activityData: data.data.values[0][1],
-  //   vitalsignData: data.data.values[1][1],
-  //   aboutUs: data.data.values[2][1],
-  //   memberInfo: data.data.values[3][1],
-  //   instructions: data.data.values[4][1],
-  //   changeResident: data.data.values[5][1],
-  // }
-
   data.data.values.forEach(element => {
     demoDataFromGoogle[element[0]] = JSON.parse(element[1]);
   });
