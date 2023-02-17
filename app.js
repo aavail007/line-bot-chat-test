@@ -55,7 +55,7 @@ app.get('/test', async (req, res) => {
 
 // event handler
 async function handleEvent(event) {
-  console.log("Get Line userId ================== type ==== " + event.message.type + " ====== ", event.source.userId);
+  console.log("Get Line userId ================== type ==== " + event.type + " ====== ", event.source.userId);
   if (event.type === 'message' || event.message.type === 'text') {
     msgEvent(event);
   } else if(event.type === 'postback') {
@@ -101,6 +101,8 @@ async function msgEvent(event) {
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
     }
+  } else if(event.message.text.includes('請輸入身分證')) {
+    replayObj = { type: 'text', text: '請輸入 許小珍 的驗證碼' };
   } else { // openai GPT 回
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
