@@ -33,12 +33,12 @@ const app = express();
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
-  console.log('req ***************', JSON.stringify(req));
-  console.log('res ***************', JSON.stringify(res));
+  console.log('req ***************', req);
+  console.log('res ***************', res);
   Promise
     .all(req.body.events.map(handleEvent))
     .then((result) => {
-      console.log('result ***************', JSON.stringify(result));
+      console.log('result ***************', result);
       res.json(result)
     })
     .catch((err) => {
