@@ -49,7 +49,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
 app.get('/test', async (req, res) => {
   let demoDataFromGoogle = await getDemoData();
-  console.log('demoDataFromGoogle=====', demoDataFromGoogle);
+  // let textString2 = JSON.parse(demoDataFromGoogle.activityData);
+  // console.log('textString2=====', textString2);
+  console.log('demoDataFromGoogle.activityData=====JSON.parse===========', JSON.parse(demoDataFromGoogle.activityData));
   res.writeHead(200,{'Content-Type':'text/plain'})
   res.end('V6----------------------' + JSON.stringify(demoDataFromGoogle));
 });
@@ -81,16 +83,16 @@ async function handleEvent(event) {
       replayObj = buildFlexMsgObj('基本資料', textString);
     } else if(event.message.text === '[操作說明]') {
       textString = demoData.instructions();
-      replayObj = buildFlexMsgObj('操作說明', textString);
+      replayObj = { type: 'text', text: textString };
     } else if(event.message.text === '[userid]') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else if(event.message.text === '[切換住民]') {
       textString = demoData.changeResident();
-      replayObj = buildFlexMsgObj('切換住民', textString);
+      replayObj = { type: 'text', text: textString };
     } else if(event.message.text.includes('[=')) { // 重複你說的話: 輸入 [={type:123}] 會取 [= ]中間的 
       replayObj = buildFlexMsgObj('自定義格式', event.message.text.match(/\[\=(\S*)]/)[1]);
     } else if(event.message.text.includes('[@')) { // 來自 google 
-      textString = demoDataFromGoogle.activityData;
+      textString = JSON.parse(demoDataFromGoogle.activityData);
       replayObj = buildFlexMsgObj('來自google data', textString);
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
