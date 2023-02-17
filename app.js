@@ -3,7 +3,7 @@ const express = require('express');
 const line = require('@line/bot-sdk');
 const axios = require('axios');
 const { Configuration, OpenAIApi } = require("openai");
-// const demoData = require('./demoData')
+const demoData = require('./demoData')
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,7 +14,7 @@ const googleEnv = {
   googleSheetId: process.env.GOOGLE_SHEET_ID,
   googleSheetName: process.env.GOOGLE_SHEET_NAME
 }
-let demoData;
+let demoDataFromGoogle;
 
 
 // create LINE SDK config from env variables
@@ -33,12 +33,12 @@ const app = express();
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
-  console.log('req ***************', req);
-  console.log('res ***************', res);
+  console.log('req ***************', JSON.stringify(req));
+  console.log('res ***************', JSON.stringify(res));
   Promise
     .all(req.body.events.map(handleEvent))
     .then((result) => {
-      console.log('result ***************', result);
+      console.log('result ***************', JSON.stringify(result));
       res.json(result)
     })
     .catch((err) => {
@@ -48,10 +48,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
 });
 
 app.get('/test', async (req, res) => {
-  let demoData = await getDemoData();
-  console.log('demoData=====', demoData.data);
+  let demoDataFromGoogle = await getDemoData();
+  console.log('demoDataFromGoogle=====', demoDataFromGoogle);
   res.writeHead(200,{'Content-Type':'text/plain'})
-  res.end('V6----------------------' + JSON.stringify(demoData.data.values[0][1]));
+  res.end('V6----------------------' + JSON.stringify(demoDataFromGoogle));
 });
 
 // event handler
@@ -68,25 +68,30 @@ async function handleEvent(event) {
 
   if (regex.test(event.message.text)) { // 有 []包起來表示不須經由 GPT 回覆
     if(event.message.text === '[活動資料]') {
-      textString = demoData.activityData;
+      textString = demoData.activityData();
       replayObj = buildFlexMsgObj('活動資料', textString);
     } else if (event.message.text === '[健康資料]') {
-      textString = demoData.vitalsignData;
+      textString = demoData.vitalsignData();
       replayObj = buildFlexMsgObj('健康資料', textString);
     } else if (event.message.text === '[機構資訊]') {
-      textString = demoData.aboutUs;
+      textString = demoData.aboutUs();
       replayObj = { type: 'text', text: textString };
     } else if(event.message.text === '[基本資料]') {
-      textString = demoData.memberInfo;
+      textString = demoData.memberInfo();
       replayObj = buildFlexMsgObj('基本資料', textString);
     } else if(event.message.text === '[操作說明]') {
-      textString = demoData.instructions;
+      textString = demoData.instructions();
       replayObj = buildFlexMsgObj('操作說明', textString);
     } else if(event.message.text === '[userid]') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else if(event.message.text === '[切換住民]') {
-      textString = demoData.changeResident;
+      textString = demoData.changeResident();
       replayObj = buildFlexMsgObj('切換住民', textString);
+    } else if(event.message.text.includes('[=')) { // 重複你說的話: 輸入 [={type:123}] 會取 [= ]中間的 
+      replayObj = buildFlexMsgObj('自定義格式', event.message.text.match(/\[\=(\S*)]/)[1]);
+    } else if(event.message.text.includes('[@')) { // 來自 google 
+      textString = demoDataFromGoogle.activityData;
+      replayObj = buildFlexMsgObj('來自google data', textString);
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
     }
@@ -99,7 +104,7 @@ async function handleEvent(event) {
     textString = completion.data.choices[0].text.trim();
     replayObj = { type: 'text', text: textString };
   }
-
+  console.log("++++++++ replayObj +++++++++", replayObj);
   // use reply API
   return client.replyMessage(event.replyToken, replayObj);
 }
@@ -116,18 +121,18 @@ async function getDemoData() {
   console.log("觸發撈取 google 資料");
   var api_url = `https://sheets.googleapis.com/v4/spreadsheets/${googleEnv.googleSheetId}/values/${googleEnv.googleSheetName}?alt=json&key=${googleEnv.googleKey}`;
   let data = await axios.get(api_url);
-  demoData = {
-    activityData: JSON.parse(JSON.stringify(data.data.values[0][1])),
-    vitalsignData: JSON.parse(JSON.stringify(data.data.values[1][1])),
-    aboutUs: JSON.parse(JSON.stringify(data.data.values[2][1])),
-    memberInfo: JSON.parse(JSON.stringify(data.data.values[3][1])),
-    instructions: JSON.parse(JSON.stringify(data.data.values[4][1])),
-    changeResident: JSON.parse(JSON.stringify(data.data.values[5][1])),
+  demoDataFromGoogle = {
+    activityData: data.data.values[0][1],
+    vitalsignData: data.data.values[1][1],
+    aboutUs: data.data.values[2][1],
+    memberInfo: data.data.values[3][1],
+    instructions: data.data.values[4][1],
+    changeResident: data.data.values[5][1],
   }
-  return data;
+  console.log('demoDataFromGoogle****************', demoDataFromGoogle);
+  console.log('JSON.stringify(demoDataFromGoogle)****************', JSON.stringify(demoDataFromGoogle));
+  return demoDataFromGoogle;
 }
-
-getDemoData();
 
 // listen on port
 const port = process.env.PORT || 3000;
