@@ -56,7 +56,7 @@ app.get('/test', async (req, res) => {
 // event handler
 async function handleEvent(event) {
   console.log("Get Line userId ================== type ==== " + event.type + " ====== ", event.source.userId);
-  if (event.type === 'message' || event.message.type === 'text') {
+  if (event.type === 'message' || event.message?.type === 'text') {
     msgEvent(event);
   } else if(event.type === 'postback') {
     postbackEvent(event);
@@ -80,13 +80,13 @@ async function msgEvent(event) {
       replayObj = buildFlexMsgObj('健康資料', textString);
     } else if (event.message.text === '[機構資訊]') {
       textString = demoDataFromGoogle.aboutUs;
-      replayObj = buildFlexMsgObj('機構資訊', textString);
+      replayObj = { type: 'text', text: textString };
     } else if(event.message.text === '[基本資料]') {
       textString = demoDataFromGoogle.memberInfo;
       replayObj = buildFlexMsgObj('基本資料', textString);
     } else if(event.message.text === '[操作說明]') {
       textString = demoDataFromGoogle.instructions;
-      replayObj = buildFlexMsgObj('操作說明', textString);
+      replayObj = { type: 'text', text: textString };
     } else if(event.message.text === '[userid]') {
       replayObj = { type: 'text', text: '您的 userId = ' + userId };
     } else if(event.message.text === '[切換住民]') {
@@ -102,7 +102,11 @@ async function msgEvent(event) {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
     }
   } else if(event.message.text.includes('請輸入身分證')) {
-    replayObj = { type: 'text', text: '請輸入 許小珍 的驗證碼' };
+    if(event.message.text.includes('false')) {
+      replayObj = { type: 'text', text: '驗證碼錯誤' };
+    } else {
+      replayObj = { type: 'text', text: '綁定成功' };
+    }
   } else { // openai GPT 回
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
@@ -120,9 +124,11 @@ async function msgEvent(event) {
 function postbackEvent(event) {
   const data = event.postback.data;
   let replayObj;
+  console.log("++++++++ postbackEvent event data +++++++++", data);
   // 根据 postback 資料执行相应的操作
   if (data === 'bindMember') {
     replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號(請勿刪除輸入框的預設文字)' };
+    console.log("++++++++ postbackEvent replayObj +++++++++", replayObj);
     return client.replyMessage(event.replyToken, replayObj);
   } else if (data === 'ACTION_2') {
     // 执行操作 2
