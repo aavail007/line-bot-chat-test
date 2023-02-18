@@ -127,7 +127,7 @@ function postbackEvent(event) {
   console.log("++++++++ postbackEvent event data +++++++++", data);
   // 根据 postback 資料执行相应的操作
   if (data === 'bindMember') {
-    replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號與驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請依照下列格式回覆\n 請輸入身分證:\n O123456789\n請輸入驗證碼: 123456\n' };
+    replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號與驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆\n\n請輸入身分證:\n O123456789\n請輸入驗證碼:\n 123456' };
     console.log("++++++++ postbackEvent replayObj +++++++++", replayObj);
     return client.replyMessage(event.replyToken, replayObj);
   } else if (data === 'ACTION_2') {
