@@ -152,7 +152,11 @@ async function getDemoData() {
   var api_url = `https://sheets.googleapis.com/v4/spreadsheets/${googleEnv.googleSheetId}/values/${googleEnv.googleSheetName}?alt=json&key=${googleEnv.googleKey}`;
   let data = await axios.get(api_url);
   data.data.values.forEach(element => {
-    demoDataFromGoogle[element[0]] = JSON.parse(element[1]);
+    try {
+      demoDataFromGoogle[element[0]] = JSON.parse(element[1]);
+    } catch (e) {
+      demoDataFromGoogle[element[0]] = element[1];
+    }
   });
   console.log('demoDataFromGoogle****************', demoDataFromGoogle);
   return demoDataFromGoogle;
