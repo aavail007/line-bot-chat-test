@@ -101,7 +101,17 @@ async function msgEvent(event) {
     } else {
       replayObj = { type: 'text', text: '很抱歉，沒有對應這個指令的回覆' };
     }
-  } else if(event.message.text.includes('請輸入身分證')) {
+  } else if(event.message.text.includes('請輸入身分證:')) { // 用戶回傳身分證，準備填入驗證碼，並帶入用戶的身分證
+      let id = event.message.text.replace("請輸入身分證:", '').trim();
+      textString = demoDataFromGoogle.writeVerificationCode;
+      textString.replace("#ID", id)
+      replayObj = buildFlexMsgObj('請輸入驗證碼', textString);
+    // if(event.message.text.includes('false')) {
+    //   replayObj = { type: 'text', text: '驗證碼錯誤' };
+    // } else {
+    //   replayObj = { type: 'text', text: '綁定成功，請點選圖文選單功能來取得長者資訊' };
+    // }
+  } else if (event.message.text.includes('請輸入身分證為')) {
     if(event.message.text.includes('false')) {
       replayObj = { type: 'text', text: '驗證碼錯誤' };
     } else {
@@ -127,11 +137,13 @@ function postbackEvent(event) {
   console.log("++++++++ postbackEvent event data +++++++++", data);
   // 根据 postback 資料执行相应的操作
   if (data === 'bindMember') {
-    replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號與驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆\n\n請輸入身分證:\n O123456789\n請輸入驗證碼:\n 123456' };
+    // replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號與驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆\n\n請輸入身分證:\n O123456789\n請輸入驗證碼:\n 123456' };
+    replayObj = { type: 'text', text: '請輸入要綁定的長者身分證字號\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆\n\n請輸入身分證:\n O123456789' };
     console.log("++++++++ postbackEvent replayObj +++++++++", replayObj);
     return client.replyMessage(event.replyToken, replayObj);
-  } else if (data === 'ACTION_2') {
-    // 执行操作 2
+  } else if (data === 'writeVerificationCode') { // 桌機版待帶入身分證
+    replayObj = { type: 'text', text: '請輸入要綁定的長者驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆\n\n請輸入身分證:\n O123456789\n請輸入驗證碼:\n 123456' };
+    return client.replyMessage(event.replyToken, replayObj);
   } else {
     // 处理其他的 postback 資料
     return Promise.resolve(null);

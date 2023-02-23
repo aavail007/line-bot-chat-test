@@ -399,4 +399,45 @@ module.exports = {
   instructions: () => {
     return "instructions 操作說明~~~~~~";
   },
+  writeVerificationCode: () => {
+    return {
+      type: "bubble",
+      body: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: "請點選下方按鈕輸入驗證碼",
+            weight: "bold",
+            size: "md",
+            align: "center",
+          },
+          { type: "separator", margin: "md" },
+        ],
+        position: "relative",
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        spacing: "sm",
+        contents: [
+          {
+            type: "button",
+            style: "link",
+            height: "sm",
+            action: {
+              type: "postback",
+              label: "輸入驗證碼",
+              data: "writeVerificationCode",
+              inputOption: "openKeyboard",
+              fillInText: "請輸入身分證為 $ID 的驗證碼:\n",
+            },
+          },
+        ],
+        flex: 0,
+        paddingTop: "none",
+      },
+    };
+  },
 };
