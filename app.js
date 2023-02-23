@@ -104,7 +104,7 @@ async function msgEvent(event) {
   } else if(event.message.text.includes('請輸入身分證:')) { // 用戶回傳身分證，準備填入驗證碼，並帶入用戶的身分證
       let id = event.message.text.replace("請輸入身分證:", '').trim();
       textString = demoDataFromGoogle.writeVerificationCode;
-      textString = JSON.parse(JSON.stringify(textString).replace("#ID", id));
+      textString = JSON.parse(JSON.stringify(textString).replace("$ID", id));
       replayObj = buildFlexMsgObj('請輸入驗證碼', textString);
     // if(event.message.text.includes('false')) {
     //   replayObj = { type: 'text', text: '驗證碼錯誤' };
@@ -142,7 +142,7 @@ function postbackEvent(event) {
     console.log("++++++++ postbackEvent replayObj +++++++++", replayObj);
     return client.replyMessage(event.replyToken, replayObj);
   } else if (data === 'writeVerificationCode') { // 桌機版待帶入身分證
-    replayObj = { type: 'text', text: '請輸入要綁定的長者驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆\n\n請輸入身分證:\n O123456789\n請輸入驗證碼:\n 123456' };
+    replayObj = { type: 'text', text: '請輸入要綁定的長者驗證碼\n※手機版請勿刪除輸入框的預設文字 \n ※桌機版請複製下列格式回覆您的驗證碼\n\n請輸入身分證為 O123456789 的驗證碼:\n' };
     return client.replyMessage(event.replyToken, replayObj);
   } else {
     // 处理其他的 postback 資料
