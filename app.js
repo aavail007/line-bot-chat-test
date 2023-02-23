@@ -104,7 +104,7 @@ async function msgEvent(event) {
   } else if(event.message.text.includes('請輸入身分證:')) { // 用戶回傳身分證，準備填入驗證碼，並帶入用戶的身分證
       let id = event.message.text.replace("請輸入身分證:", '').trim();
       textString = demoDataFromGoogle.writeVerificationCode;
-      textString.replace("#ID", id)
+      textString = JSON.parse(JSON.stringify(textString).replace("#ID", id));
       replayObj = buildFlexMsgObj('請輸入驗證碼', textString);
     // if(event.message.text.includes('false')) {
     //   replayObj = { type: 'text', text: '驗證碼錯誤' };
