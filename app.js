@@ -92,8 +92,6 @@ async function msgEvent(event) {
     } else if(event.message.text === '[切換住民]') {
       textString = demoDataFromGoogle.changeResident;
       replayObj = buildFlexMsgObj('切換住民', textString);
-    } else if(event.message.text.includes('[=')) { // 重複你說的話: 輸入 [={type:123}] 會取 [= ]中間的 
-      replayObj = buildFlexMsgObj('自定義格式', event.message.text.match(/\[\=(\S*)]/)[1]);
     } else if(event.message.text.includes('[@')) { // 來自 google 
       let key = event.message.text.match(/\[\@(\S*)]/)[1]
       textString = demoDataFromGoogle[key];
@@ -122,11 +120,11 @@ async function msgEvent(event) {
     replayObj = demoDataFromGoogle[key];
   } else if(event.message.text.includes('!!')) {
     let imgCount = event.message.text.slice(2);
-    if(!imgCount) {// 沒有數字就只回傳一張圖片
+    if(!imgCount) {// !!後面沒有字就只回傳一張圖片
       replayObj = {
         type: "image",
         originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg",
-        previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture-thumb/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg"
+        previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg"
       }
     } else { // 依據 google 資料顯示圖片陣列
       replayObj = demoDataFromGoogle.pictures;
