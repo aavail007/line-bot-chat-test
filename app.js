@@ -121,8 +121,8 @@ async function msgEvent(event) {
     let imgCount = event.message.text.slice(2);
     replayObj = {
       type: "image",
-      originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/血壓-1個月.jpg",
-      previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/血壓-1個月.jpg"
+      originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg",
+      previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture-thumb/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg"
     }
   } else { // openai GPT 回
     const completion = await openai.createCompletion({
