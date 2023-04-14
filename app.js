@@ -50,7 +50,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 app.get('/test', async (req, res) => {
   let demoDataFromGoogle = await getDemoData();
   res.writeHead(200,{'Content-Type':'text/plain'})
-  res.end('V6----------------------' + JSON.stringify(demoDataFromGoogle));
+  res.end('V7----------------------' + JSON.stringify(demoDataFromGoogle));
 });
 
 // event handler
@@ -119,10 +119,14 @@ async function msgEvent(event) {
     }
   } else if(event.message.text.includes('!!')) {
     let imgCount = event.message.text.slice(2);
-    replayObj = {
-      type: "image",
-      originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg",
-      previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture-thumb/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg"
+    if(imgCount) {// 沒有數字就只回傳一張圖片
+      replayObj = {
+        type: "image",
+        originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg",
+        previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture-thumb/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg"
+      }
+    } else { // 依據 google 資料顯示圖片陣列
+      replayObj = demoDataFromGoogle.pictures;
     }
   } else { // openai GPT 回
     const completion = await openai.createCompletion({
