@@ -50,7 +50,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 app.get('/test', async (req, res) => {
   let demoDataFromGoogle = await getDemoData();
   res.writeHead(200,{'Content-Type':'text/plain'})
-  res.end('V7----------------------' + JSON.stringify(demoDataFromGoogle));
+  res.end('V8----------------------' + JSON.stringify(demoDataFromGoogle));
 });
 
 // event handler
@@ -117,9 +117,12 @@ async function msgEvent(event) {
     } else {
       replayObj = { type: 'text', text: '綁定成功，請點選圖文選單功能來取得長者資訊' };
     }
+  } else if (event.message.text.includes('$')) { // 完全依照 google 取得的格式傳出訊息
+    let key = event.message.text.match(/\$(\S*)/)[1];
+    replayObj = demoDataFromGoogle[key];
   } else if(event.message.text.includes('!!')) {
     let imgCount = event.message.text.slice(2);
-    if(imgCount) {// 沒有數字就只回傳一張圖片
+    if(!imgCount) {// 沒有數字就只回傳一張圖片
       replayObj = {
         type: "image",
         originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/%E9%AB%94%E9%87%8D%E5%9C%96%E8%A1%A8.jpg",
