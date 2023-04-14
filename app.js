@@ -117,6 +117,13 @@ async function msgEvent(event) {
     } else {
       replayObj = { type: 'text', text: '綁定成功，請點選圖文選單功能來取得長者資訊' };
     }
+  } else if(event.message.text.includes('!!')) {
+    let imgCount = event.message.text.slice(2);
+    replayObj = {
+      type: "image",
+      originalContentUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/血壓-1個月.jpg",
+      previewImageUrl: "https://ykresourcecaas.blob.core.windows.net/caas-picture/shdemo/ResidentCandidate/6433c8c21e2cc95ba4327704/血壓-1個月.jpg"
+    }
   } else { // openai GPT 回
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
@@ -130,6 +137,8 @@ async function msgEvent(event) {
   // use reply API
   return client.replyMessage(event.replyToken, replayObj);
 }
+
+
 
 function postbackEvent(event) {
   const data = event.postback.data;
