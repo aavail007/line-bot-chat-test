@@ -33,12 +33,13 @@ const app = express();
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
-  console.log('req ***************', req);
-  console.log('res ***************', res);
+  console.log('req ***************', JSON.stringify(req));
+  console.log('res ***************', JSON.stringify(res));
+  console.log('req.body.events ***************', JSON.stringify(req.body.events));
   Promise
     .all(req.body.events.map(handleEvent))
     .then((result) => {
-      console.log('result ***************', result);
+      console.log('result ***************', JSON.stringify(result));
       res.json(result)
     })
     .catch((err) => {
@@ -55,7 +56,8 @@ app.get('/test', async (req, res) => {
 
 // event handler
 async function handleEvent(event) {
-  console.log("Get Line userId ================== type ==== " + event.type + " ====== ", event.source.userId);
+  console.log("Get Line userId ================== type ==== " + event?.type + " ====== ", event?.source?.userId);
+  console.log("event.message.text ============", event?.message?.text);
   if (event.type === 'message' || event.message?.type === 'text') {
     msgEvent(event);
   } else if(event.type === 'postback') {
